@@ -81,6 +81,33 @@ class ConfigurationProxyTest < ActiveSupport::TestCase
     end
   end
 
+  test "healthcheck options are passed through to the proxy" do
+    @deploy[:proxy] = {
+      "host" => "example.com",
+      "healthcheck" => {
+        "port" => 9002,
+        "protocol" => "websocket",
+        "path" => "/mqtt",
+        "websocket_subprotocol" => "mqtt"
+      }
+    }
+
+    options = config.proxy.deploy_options
+    assert_equal 9002, options[:"health-check-port"]
+    assert_equal "websocket", options[:"health-check-protocol"]
+    assert_equal "/mqtt", options[:"health-check-path"]
+    assert_equal "mqtt", options[:"health-check-websocket-subprotocol"]
+  end
+
+  test "healthcheck options are omitted when unset" do
+    @deploy[:proxy] = { "host" => "example.com" }
+
+    options = config.proxy.deploy_options
+    assert_not options.key?(:"health-check-port")
+    assert_not options.key?(:"health-check-protocol")
+    assert_not options.key?(:"health-check-websocket-subprotocol")
+  end
+
   test "ssl with certificate and no private key" do
     with_test_secrets("secrets" => "CERT_PEM=certificate") do
       @deploy[:proxy] = {

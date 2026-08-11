@@ -114,10 +114,25 @@ proxy:
   # the deploy timeout, with a 5-second timeout for each request.
   #
   # Once the app is up, the proxy will stop hitting the healthcheck endpoint.
+  # `port` checks a different port than traffic is proxied to.
+  #
+  # `protocol: websocket` sends the opening handshake of a WebSocket connection
+  # and treats `101 Switching Protocols` as healthy, rather than sending a GET
+  # and requiring a 2xx. That lets a WebSocket-only target -- an MQTT broker
+  # behind `wss://`, say -- be checked on the port clients actually use,
+  # instead of needing a second HTTP-only listener that proves nothing about
+  # the first one.
+  #
+  # `websocket_subprotocol` sets `Sec-WebSocket-Protocol`. Optional, but some
+  # servers will not complete the handshake without the subprotocol they speak
+  # (Mosquitto wants `mqtt`).
   healthcheck:
     interval: 3
     path: /health
     timeout: 3
+    port: 9002
+    protocol: websocket
+    websocket_subprotocol: mqtt
 
   # Buffering
   #
