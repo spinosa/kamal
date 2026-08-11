@@ -122,7 +122,7 @@ proxy:
   #
   # `websocket_subprotocol` sets `Sec-WebSocket-Protocol`. Optional, but some
   # servers will not complete the handshake without the subprotocol they speak
-  # (Mosquitto wants `mqtt`).
+  # -- MQTT over WebSocket, for instance, expects `mqtt`.
   healthcheck:
     interval: 3
     path: /health
