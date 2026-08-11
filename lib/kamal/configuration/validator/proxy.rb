@@ -26,10 +26,6 @@ class Kamal::Configuration::Validator::Proxy < Kamal::Configuration::Validator
       if healthcheck = config["healthcheck"]
         protocol = healthcheck["protocol"]
 
-        # Without this, a typo silently becomes an HTTP check: kamal-proxy
-        # compares the protocol to "websocket" and anything else falls through.
-        # A WebSocket-only target would then fail its healthcheck forever, with
-        # nothing to distinguish that from a genuinely broken service.
         if protocol.present? && !PROXY_HEALTHCHECK_PROTOCOLS.include?(protocol)
           error "Invalid healthcheck protocol: #{protocol} (must be one of #{PROXY_HEALTHCHECK_PROTOCOLS.join(", ")})"
         end
