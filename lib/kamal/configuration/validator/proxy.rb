@@ -1,4 +1,6 @@
 class Kamal::Configuration::Validator::Proxy < Kamal::Configuration::Validator
+  PROXY_HEALTHCHECK_PROTOCOLS = [ "http", "websocket" ].freeze
+
   def validate!
     unless config.nil?
       super
@@ -18,6 +20,22 @@ class Kamal::Configuration::Validator::Proxy < Kamal::Configuration::Validator
 
         if config["ssl"]["private_key_pem"].present? && config["ssl"]["certificate_pem"].blank?
           error "Missing certificate_pem setting (required when private_key_pem is present)"
+        end
+      end
+
+      if healthcheck = config["healthcheck"]
+        protocol = healthcheck["protocol"]
+
+        # Without this, a typo silently becomes an HTTP check: kamal-proxy
+        # compares the protocol to "websocket" and anything else falls through.
+        # A WebSocket-only target would then fail its healthcheck forever, with
+        # nothing to distinguish that from a genuinely broken service.
+        if protocol.present? && !PROXY_HEALTHCHECK_PROTOCOLS.include?(protocol)
+          error "Invalid healthcheck protocol: #{protocol} (must be one of #{PROXY_HEALTHCHECK_PROTOCOLS.join(", ")})"
+        end
+
+        if healthcheck["websocket_subprotocol"].present? && protocol != "websocket"
+          error "Cannot set websocket_subprotocol unless the healthcheck protocol is websocket"
         end
       end
 

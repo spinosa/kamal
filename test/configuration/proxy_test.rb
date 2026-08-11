@@ -99,6 +99,27 @@ class ConfigurationProxyTest < ActiveSupport::TestCase
     assert_equal "mqtt", options[:"health-check-websocket-subprotocol"]
   end
 
+  test "an unknown healthcheck protocol is rejected" do
+    @deploy[:proxy] = { "host" => "example.com", "healthcheck" => { "protocol" => "websockets" } }
+
+    error = assert_raises(Kamal::ConfigurationError) { config.proxy }
+    assert_match(/Invalid healthcheck protocol: websockets/, error.message)
+  end
+
+  test "a websocket subprotocol without the websocket protocol is rejected" do
+    @deploy[:proxy] = { "host" => "example.com", "healthcheck" => { "websocket_subprotocol" => "mqtt" } }
+
+    error = assert_raises(Kamal::ConfigurationError) { config.proxy }
+    assert_match(/websocket_subprotocol/, error.message)
+  end
+
+  test "the supported healthcheck protocols are accepted" do
+    [ "http", "websocket" ].each do |protocol|
+      @deploy[:proxy] = { "host" => "example.com", "healthcheck" => { "protocol" => protocol } }
+      assert_equal protocol, config.proxy.deploy_options[:"health-check-protocol"]
+    end
+  end
+
   test "healthcheck options are omitted when unset" do
     @deploy[:proxy] = { "host" => "example.com" }
 
