@@ -105,10 +105,14 @@ class ConfigurationProxyTest < ActiveSupport::TestCase
   end
 
   test "a websocket subprotocol without the websocket protocol is rejected" do
-    @deploy[:proxy] = { "host" => "example.com", "healthcheck" => { "websocket_subprotocol" => "mqtt" } }
+    [ nil, "http" ].each do |protocol|
+      healthcheck = { "websocket_subprotocol" => "mqtt" }
+      healthcheck["protocol"] = protocol if protocol
+      @deploy[:proxy] = { "host" => "example.com", "healthcheck" => healthcheck }
 
-    error = assert_raises(Kamal::ConfigurationError) { config.proxy }
-    assert_match(/websocket_subprotocol/, error.message)
+      error = assert_raises(Kamal::ConfigurationError) { config.proxy }
+      assert_match(/websocket_subprotocol/, error.message)
+    end
   end
 
   test "the supported healthcheck protocols are accepted" do

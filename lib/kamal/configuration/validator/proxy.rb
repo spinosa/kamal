@@ -1,5 +1,5 @@
 class Kamal::Configuration::Validator::Proxy < Kamal::Configuration::Validator
-  PROXY_HEALTHCHECK_PROTOCOLS = [ "http", "websocket" ].freeze
+  HEALTHCHECK_PROTOCOLS = [ "http", "websocket" ].freeze
 
   def validate!
     unless config.nil?
@@ -26,8 +26,8 @@ class Kamal::Configuration::Validator::Proxy < Kamal::Configuration::Validator
       if healthcheck = config["healthcheck"]
         protocol = healthcheck["protocol"]
 
-        if protocol.present? && !PROXY_HEALTHCHECK_PROTOCOLS.include?(protocol)
-          error "Invalid healthcheck protocol: #{protocol} (must be one of #{PROXY_HEALTHCHECK_PROTOCOLS.join(", ")})"
+        if protocol.present? && !HEALTHCHECK_PROTOCOLS.include?(protocol)
+          error "Invalid healthcheck protocol: #{protocol} (must be one of #{HEALTHCHECK_PROTOCOLS.join(", ")})"
         end
 
         if healthcheck["websocket_subprotocol"].present? && protocol != "websocket"

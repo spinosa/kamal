@@ -115,12 +115,10 @@ proxy:
   #
   # Once the app is up, the proxy will stop hitting the healthcheck endpoint.
   #
-  # `protocol: websocket` sends the opening handshake of a WebSocket connection
-  # and treats `101 Switching Protocols` as healthy, rather than sending a GET
-  # and requiring a 2xx. That lets a WebSocket-only target -- an MQTT broker
-  # behind `wss://`, say -- be checked on the port clients actually use,
-  # instead of needing a second HTTP-only listener that proves nothing about
-  # the first one.
+  # `protocol` is `http` (the default) or `websocket`. With `websocket` the
+  # proxy sends a WebSocket handshake and treats `101 Switching Protocols` as
+  # healthy, so a target that only speaks WebSocket can be checked on the port
+  # it serves.
   #
   # `websocket_subprotocol` sets `Sec-WebSocket-Protocol`. Optional, but some
   # servers will not complete the handshake without the subprotocol they speak
