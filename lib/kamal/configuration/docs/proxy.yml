@@ -123,10 +123,6 @@ proxy:
   # `websocket_subprotocol` sets `Sec-WebSocket-Protocol`. Optional, but some
   # servers will not complete the handshake without the subprotocol they speak
   # -- MQTT over WebSocket, for instance, expects `mqtt`.
-  #
-  # Leave `path` at its default rather than pointing it at a path your clients
-  # use: while a service is paused or stopped, any GET on the healthcheck path
-  # is answered with a bare 200, which real clients would receive too.
   healthcheck:
     interval: 3
     path: /health
